@@ -54,8 +54,24 @@ const App = () => {
 
   const addName = (event) => {
     event.preventDefault();
-    if (persons.find((person) => person.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
+    let newPerson = {...persons.find((person) => person.name === newName)};
+    if (newPerson) {
+      if (
+        window.confirm(
+          `${newName} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        newPerson.number = newNumber;
+        personService
+          .update(newPerson.id, newPerson)
+          .then((returnedPerson) =>{
+            setPersons(
+              persons.map((person) =>
+                person.id === newPerson.id ? returnedPerson : person
+              )
+            )}
+          );
+      }
     } else {
       const person = { name: newName, number: newNumber };
       personService.create(person).then((newPerson) => {
@@ -80,9 +96,13 @@ const App = () => {
 
   const handleErase = (event) => {
     let id = event.target.id;
-    console.log(id)
-    if (window.confirm(`Delete ${persons.find(person => person.id === parseInt(id)).name}?`)) {
-      personService.erase(id)
+    console.log(id);
+    if (
+      window.confirm(
+        `Delete ${persons.find((person) => person.id === parseInt(id)).name}?`
+      )
+    ) {
+      personService.erase(id);
       setPersons(persons.filter((person) => person.id !== parseInt(id)));
     }
     setNewName("");
