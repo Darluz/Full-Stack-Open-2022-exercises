@@ -1,9 +1,14 @@
 const { application } = require('express');
 const express = require('express');
-const { json } = require('express/lib/response');
 const app = express();
+const { json } = require('express/lib/response');
+var morgan = require('morgan');
+
 
 app.use(express.json());
+app.use(morgan('tiny'));
+morgan.token('body', (req) => JSON.stringify(req.body));
+app.use(morgan(':method :url :status :body'));
 
 const getRandomInt = (max) => Math.floor(Math.random() * max);
 
