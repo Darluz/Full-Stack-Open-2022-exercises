@@ -84,12 +84,14 @@ const App = () => {
       }
     } else {
       const person = { name: newName, number: newNumber };
-      personService.create(person).then((newPerson) => {
+      personService.create(person)
+      .then((newPerson) => {
         setPersons(persons.concat(newPerson));
         let newMessage = [`Added ${person.name}`, false];
         setMessage(newMessage);
         setTimeout(() => setMessage(["", false]), 5000);
-      });
+      })
+      .catch(error => setMessage([error.response.data, true]))
     }
     setNewName("");
     setNewNumber("");

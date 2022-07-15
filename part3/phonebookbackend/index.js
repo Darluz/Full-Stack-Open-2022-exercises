@@ -1,7 +1,6 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
-const { json } = require("express/lib/response");
 var morgan = require("morgan");
 const cors = require("cors");
 const Person = require("./models/person");
@@ -18,18 +17,17 @@ app.use(morgan(":method :url :status :body"));
 const errorHandler = (error, request, response, next) => {
   console.error(error.message);
 
-  if(error.name === 'CastError'){
-    return response.status(400).send({error: 'malformatted id'})
+  if (error.name === "CastError") {
+    return response.status(400).send({ error: "malformatted id" });
   }
 
   next(error);
-}
+};
 
 // this has to be the last loaded middleware
 app.use(errorHandler);
 
-
-const getRandomInt = (max) => Math.floor(Math.random() * max);
+//const getRandomInt = (max) => Math.floor(Math.random() * max);
 
 let persons = [
   {
@@ -77,9 +75,9 @@ app.get("/api/persons/:id", (request, response) => {
   }
 });
 
-app.delete("/api/persons/:id", (request, response) => {
+app.delete("/api/persons/:id", (request, response, next) => {
   Person.findByIdAndDelete(request.params.id)
-    .then((result) => {
+    .then(() => {
       response.status(204).end();
     })
     .catch((error) => next(error));
@@ -111,23 +109,24 @@ app.post("/api/persons", (request, response) => {
   person.save().then((savedPerson) => response.json(savedPerson));
 });
 
-app.put('/api/persons/:id', (request, response, next) => {
+app.put("/api/persons/:id", (request, response, next) => {
   const body = request.body;
 
   const person = {
     name: body.name,
     number: body.number,
-  }
+  };
 
-  Person.findByIdAndUpdate(request.params.id, person, {new: true})
-  .then(updatedNote => {
-    response.json(updatedNote);
-  })
-  .catch(error => next(error))
-})
+  Person.findByIdAndUpdate(request.params.id, person, { new: true })
+    .then((updatedNote) => {
+      response.json(updatedNote);
+    })
+    .catch((error) => next(error));
+});
+
+/*eslint no-undef: "error"*/
+/*eslint-env node*/
 
 const PORT = process.env.PORT;
 console.log(PORT);
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+app.listen(PORT);
